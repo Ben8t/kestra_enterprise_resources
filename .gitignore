@@ -1,0 +1,15 @@
+gcp_service_account/
+
+# Terraform lock/state and secrets
+**/.terraform/
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.backup
+**/*.tfvars
+**/*.tfvars.json
+
+# License file (British spelling)
+licence.txt
+
+# Docker Compose
+docker-compose.yml
