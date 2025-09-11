@@ -1,0 +1,23 @@
+id: kestra_agent
+namespace: kestra
+inputs:
+  - id: prompt
+    type: STRING
+
+tasks:
+  - id: agent
+    type: io.kestra.plugin.ai.agent.AIAgent
+    prompt: "{{ inputs.prompt }}"
+    systemMessage: Return any output as a simple plain text (separated with commas or newlines depending on the output type). Avoid markdown. Don't ask anything else to the user. Execute the query.
+    provider:
+      type: io.kestra.plugin.ai.provider.OpenAI
+      modelName: gpt-5-mini
+      apiKey: "{{ secret('OPENAI_API_KEY') }}"
+    tools:
+      - type: io.kestra.plugin.ai.tool.DockerMcpClient
+        image: ghcr.io/kestra-io/mcp-server-python:latest
+        env:
+          KESTRA_BASE_URL: "{{ kv('KESTRA_BASE_URL') }}"
+          KESTRA_TENANT_ID: "{{ kv('KESTRA_TENANT_ID') }}"
+          KESTRA_USERNAME: "{{ secret('KESTRA_USERNAME') }}"
+          KESTRA_PASSWORD: "{{ secret('KESTRA_PASSWORD') }}"

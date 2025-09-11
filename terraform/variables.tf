@@ -3,11 +3,6 @@ variable "kestra_user" {
   sensitive = true
 }
 
-variable "kestra_password" {
-  type      = string
-  sensitive = true
-}
-
 variable "aws_key" {
   type      = string
   sensitive = true
@@ -31,4 +26,25 @@ variable "github_token" {
 variable "resend_api" {
   type      = string
   sensitive = true
+}
+
+variable "openai_api_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "kestra_base_url" {
+  type      = string
+}
+
+variable "kestra_tenant_id" {
+  type      = string
+}
+
+variable "kestra_username" {
+  type      = string
+}
+
+variable "kestra_password" {
+  type      = string
 }

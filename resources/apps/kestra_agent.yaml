@@ -1,0 +1,50 @@
+id: kestra_agent
+type: io.kestra.plugin.ee.apps.Execution
+displayName: Kestra Agent
+namespace: kestra
+flowId: kestra_agent
+tags:
+  - AI
+
+layout:
+  - on: OPEN
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Kestra Agent 🤖
+          Ask Kestra to do something.
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
+        text: Submit
+
+  - on: RUNNING
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Fetching results...
+          Don't close this window. The results will be displayed as soon as the processing is complete.
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Loading
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CancelExecutionButton
+        text: Cancel request
+
+  - on: SUCCESS
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Here is the results requested
+
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Inputs
+
+      - type: io.kestra.plugin.ee.apps.core.blocks.Alert
+        style: SUCCESS
+        showIcon: true
+
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+
+      - type: io.kestra.plugin.ee.apps.core.blocks.Button
+        text: Submit new request
+        url: "{{ app.url }}"
+        style: DEFAULT
+
