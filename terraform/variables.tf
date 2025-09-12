@@ -3,30 +3,12 @@ variable "kestra_user" {
   sensitive = true
 }
 
-variable "aws_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "aws_secret" {
-  type      = string
-  sensitive = true
-}
-
-variable "slack_webhook" {
-  type      = string
-  sensitive = true
-}
 
 variable "github_token" {
   type      = string
   sensitive = true
 }
 
-variable "resend_api" {
-  type      = string
-  sensitive = true
-}
 
 variable "openai_api_key" {
   type      = string
@@ -47,4 +29,45 @@ variable "kestra_username" {
 
 variable "kestra_password" {
   type      = string
+}
+
+# New variables for Docker Compose integration
+variable "postgres_db" {
+  type      = string
+  sensitive = true
+}
+
+variable "postgres_user" {
+  type      = string
+  sensitive = true
+}
+
+variable "postgres_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "kestra_encryption_secret_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "kestra_jdbc_secret" {
+  type      = string
+  sensitive = true
+}
+
+variable "kestra_license_id" {
+  type      = string
+  sensitive = true
+}
+
+variable "kestra_license_fingerprint" {
+  type      = string
+  sensitive = true
+}
+
+variable "kestra_license_key" {
+  type      = string
+  sensitive = true
 }

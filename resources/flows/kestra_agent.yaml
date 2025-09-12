@@ -17,7 +17,7 @@ tasks:
       - type: io.kestra.plugin.ai.tool.DockerMcpClient
         image: ghcr.io/kestra-io/mcp-server-python:latest
         env:
-          KESTRA_BASE_URL: "{{ kv('KESTRA_BASE_URL') }}"
+          KESTRA_BASE_URL: "http://host.docker.internal:8080/api/v1"
           KESTRA_TENANT_ID: "{{ kv('KESTRA_TENANT_ID') }}"
           KESTRA_USERNAME: "{{ secret('KESTRA_USERNAME') }}"
           KESTRA_PASSWORD: "{{ secret('KESTRA_PASSWORD') }}"

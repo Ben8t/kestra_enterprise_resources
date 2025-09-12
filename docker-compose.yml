@@ -1,0 +1,95 @@
+volumes:
+  postgres-data:
+    driver: local
+  kestra-data:
+    driver: local
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    ports:
+      - "55432:5432"
+  kestra:
+    image: registry.kestra.io/docker/kestra-ee:v1.0.0
+    pull_policy: never
+    entrypoint: /bin/bash
+    user: "root"
+    command:
+      - -c
+      - /app/kestra server standalone --worker-thread=128
+    volumes:
+      - kestra-data:/app/storage
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/kestra-wd:/tmp/kestra-wd
+    environment:
+      KESTRA_CONFIGURATION: |
+        datasources:
+          postgres:
+            url: jdbc:postgresql://postgres:5432/kestra
+            driverClassName: org.postgresql.Driver
+            username: ${POSTGRES_USER}
+            password: ${POSTGRES_PASSWORD}
+        kestra:
+          ai:
+           type: openai
+           openai: 
+             api-key: ${OPENAI_API_KEY}
+          encryption:
+            secret-key: "${KESTRA_ENCRYPTION_SECRET_KEY}"
+          # security:
+          #   super-admin:
+          #     username: ${KESTRA_USER}
+          #     password: ${KESTRA_PASSWORD}
+          environment:
+            name: prod
+            color: "#2C0059"
+          secret:
+              type: jdbc
+              jdbc:
+                secret: "${KESTRA_JDBC_SECRET}"
+  
+          ee:
+            license:
+              id: ${KESTRA_LICENSE_ID}
+              fingerprint: ${KESTRA_LICENSE_FINGERPRINT}
+              key: | 
+                ${KESTRA_LICENSE_KEY}
+          repository:
+            type: postgres
+          storage:
+            type: local
+            local:
+              base-path: "/app/storage"
+          queue:
+            type: postgres
+          tasks:
+            tmp-dir:
+              path: /tmp/kestra-wd/tmp
+          url: http://localhost:8080/
+          plugins:
+            configurations:
+              - type: io.kestra.plugin.scripts.runner.docker.Docker
+                values:
+                  volume-enabled: true # 👈 this is the relevant setting
+    ports:
+      - "8080:8080"
+      - "8090:8081"
+    depends_on:
+      postgres:
+        condition: service_started
+
+networks: 
+  default: 
+    external: 
+      name: kestra-net

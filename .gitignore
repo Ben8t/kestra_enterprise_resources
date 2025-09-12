@@ -11,5 +11,5 @@ gcp_service_account/
 # License file (British spelling)
 licence.txt
 
-# Docker Compose
-docker-compose.yml
+# Environment files
+.env
