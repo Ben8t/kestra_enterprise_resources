@@ -1,12 +1,12 @@
 # HTTP API (FastAPI + uv)
 
-Serve `data/data.csv` over HTTP.
+Serve `data/data.json` over HTTP.
 
 ## Quick start
 
 ```bash
 # from repo root, go into this folder (recommended)
-cd http_api
+cd local_api
 
 # install uv if needed
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -28,7 +28,7 @@ uv run --project http_api uvicorn http_api.main:app --host 0.0.0.0 --port 28080 
 - **API**: `http://localhost:28080`
 - **Docs**: `http://localhost:28080/docs`
 - **Health**: `GET /health` → `ok`
-- **CSV**: `GET /data` → serves `data.csv`
+- **JSON**: `GET /data` → serves `data.json`
 
 ## Notes
 - Uses FastAPI and Uvicorn.
