@@ -1,0 +1,13 @@
+[project]
+name = "kestra-ee-local-api"
+version = "0.1.0"
+description = "Minimal FastAPI server to serve data.csv"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn[standard]>=0.30.0",
+]
+
+# No custom uv settings needed; use explicit uv run commands in README
+

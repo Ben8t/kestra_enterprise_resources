@@ -13,3 +13,9 @@ resource "kestra_namespace" "kestra_weather" {
   description     = "Weather Namespace"
   depends_on   = [kestra_namespace.kestra]
 }
+
+resource "kestra_namespace" "kestra_local" {
+  namespace_id    = "kestra.local"
+  description     = "Local Namespace"
+  depends_on   = [kestra_namespace.kestra]
+}
