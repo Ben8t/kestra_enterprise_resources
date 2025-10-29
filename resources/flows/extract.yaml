@@ -34,7 +34,7 @@ tasks:
 
 
   - id: normalize_data
-    type: io.kestra.plugin.jdbc.duckdb.Query
+    type: io.kestra.plugin.jdbc.duckdb.Queries
     store: true
     inputFiles:
       data.json: "{{ outputs.download_weather_data.uri }}"
