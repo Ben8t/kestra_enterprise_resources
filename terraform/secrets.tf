@@ -34,3 +34,31 @@ resource "kestra_namespace_secret" "resend_api_key" {
   secret_value = var.resend_api_key
   depends_on   = [kestra_namespace.kestra]
 }
+
+resource "kestra_namespace_secret" "aws_access_key" {
+  namespace    = kestra_namespace.kestra.id
+  secret_key   = "AWS_ACCESS_KEY"
+  secret_value = var.aws_access_key
+  depends_on   = [kestra_namespace.kestra]
+}
+
+resource "kestra_namespace_secret" "aws_secret_access_key" {
+  namespace    = kestra_namespace.kestra.id
+  secret_key   = "AWS_SECRET_ACCESS_KEY"
+  secret_value = var.aws_secret_access_key
+  depends_on   = [kestra_namespace.kestra]
+}
+
+resource "kestra_namespace_secret" "aws_region" {
+  namespace    = kestra_namespace.kestra.id
+  secret_key   = "AWS_REGION"
+  secret_value = var.aws_region
+  depends_on   = [kestra_namespace.kestra]
+}
+
+resource "kestra_namespace_secret" "aws_s3_bucket" {
+  namespace    = kestra_namespace.kestra.id
+  secret_key   = "AWS_S3_BUCKET"
+  secret_value = var.aws_s3_bucket
+  depends_on   = [kestra_namespace.kestra]
+}

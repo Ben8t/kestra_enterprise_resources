@@ -76,3 +76,23 @@ variable "resend_api_key"{
   type = string
   sensitive = true
 }
+
+variable "aws_access_key" {
+  type = string
+  sensitive = true
+}
+
+variable "aws_secret_access_key" {
+  type = string
+  sensitive = true
+}
+
+variable "aws_region" {
+  type = string
+  sensitive = true
+}
+
+variable "aws_s3_bucket" {
+  type = string
+  sensitive = true
+}
