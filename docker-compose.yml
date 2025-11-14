@@ -8,7 +8,7 @@ services:
   postgres:
     image: postgres
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -20,14 +20,11 @@ services:
       retries: 10
     ports:
       - "55432:5432"
-  kestra:
+  kestra: 
     image: registry.kestra.io/docker/kestra-ee:develop
     pull_policy: never
-    entrypoint: /bin/bash
     user: "root"
-    command:
-      - -c
-      - /app/kestra server standalone --worker-thread=128
+    command: server standalone --worker-thread=128
     volumes:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock

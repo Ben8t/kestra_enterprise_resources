@@ -27,3 +27,10 @@ resource "kestra_namespace_secret" "kestra_password" {
   secret_value = var.kestra_password
   depends_on   = [kestra_namespace.kestra]
 }
+
+resource "kestra_namespace_secret" "resend_api_key" {
+  namespace    = kestra_namespace.kestra.id
+  secret_key   = "RESEND_API_KEY"
+  secret_value = var.resend_api_key
+  depends_on   = [kestra_namespace.kestra]
+}
