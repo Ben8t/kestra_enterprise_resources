@@ -53,9 +53,11 @@ services:
             name: prod
             color: "#2C0059"
           secret:
-              type: jdbc
-              jdbc:
-                secret: "${KESTRA_JDBC_SECRET}"
+            type: aws-secret-manager
+            aws-secret-manager:
+              access-key-id: ${AWS_ACCESS_KEY}
+              secret-key-id: ${AWS_SECRET_ACCESS_KEY}
+              region: ${AWS_REGION}
   
           ee:
             license:
@@ -66,9 +68,12 @@ services:
           repository:
             type: postgres
           storage:
-            type: local
-            local:
-              base-path: "/app/storage"
+            type: s3
+            s3:
+              access-key: ${AWS_ACCESS_KEY}
+              secret-key: ${AWS_SECRET_ACCESS_KEY}
+              region: ${AWS_REGION}
+              bucket: ${AWS_S3_BUCKET}
           queue:
             type: postgres
           tasks:
