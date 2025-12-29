@@ -1,0 +1,42 @@
+id: data_pipeline_assets
+namespace: kestra.company.data
+
+tasks:
+  - id: create_staging_layer_asset
+    type: io.kestra.plugin.jdbc.duckdb.Query
+    sql: |
+      CREATE TABLE IF NOT EXISTS trips AS
+      select VendorID, passenger_count, trip_distance from sample_data.nyc.taxi limit 10;
+    assets:
+      inputs:
+        - id: sample_data.nyc.taxi
+      outputs:
+          - id: trips
+            namespace: "{{flow.namespace}}"
+            type: io.kestra.core.models.assets.Table
+            metadata:
+              model_layer: staging
+
+  - id: for_each
+    type: io.kestra.plugin.core.flow.ForEach
+    values:
+      - passenger_count
+      - trip_distance
+    tasks:
+      - id: create_mart_layer_asset
+        type: io.kestra.plugin.jdbc.duckdb.Query
+        sql: SELECT AVG({{taskrun.value}}) AS avg_{{taskrun.value}} FROM trips;
+        assets:
+          inputs:
+              - id: trips
+          outputs:
+              - id: avg_{{taskrun.value}}
+                type: io.kestra.core.models.assets.Table
+                namespace: "{{flow.namespace}}"
+                metadata:
+                  model_layer: mart
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.duckdb
+    values:
+      url: "jdbc:duckdb:md:my_db?motherduck_token={{ secret('MOTHERDUCK_TOKEN') }}"
+      fetchType: STORE

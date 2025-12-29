@@ -1,0 +1,11 @@
+id: log_table_assets
+namespace: kestra.company.data
+
+tasks:
+  - id: for_each_assets
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "{{ assets(type='io.kestra.core.models.assets.Table') }}"
+    tasks:
+      - id: log_table_asset
+        type: io.kestra.plugin.core.log.Log
+        message: "Logging table asset {{ taskrun.value }}"
