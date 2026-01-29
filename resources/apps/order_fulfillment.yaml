@@ -1,0 +1,46 @@
+id: order_fulfillment_app
+type: io.kestra.plugin.ee.apps.Execution
+displayName: Order Fulfillment
+namespace: acme.operations
+flowId: order_fulfillment
+tags:
+  - Operations
+  - Logistics
+
+layout:
+  - on: OPEN
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## 📦 Order Fulfillment
+          Process and ship customer orders.
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
+        text: Process Order
+
+  - on: RUNNING
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Processing Order...
+          Checking inventory, picking, packing, and generating shipping label.
+      - type: io.kestra.plugin.ee.apps.core.blocks.Loading
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
+
+  - on: SUCCESS
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## ✅ Order Shipped!
+      
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Alert
+        style: SUCCESS
+        showIcon: true
+        content: Customer has been notified with tracking information.
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Button
+        text: Process Another Order
+        url: "{{ app.url }}"
+        style: DEFAULT

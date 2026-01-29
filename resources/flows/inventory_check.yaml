@@ -1,0 +1,34 @@
+id: inventory_check
+namespace: acme.operations
+description: Daily inventory level monitoring
+
+tasks:
+  - id: scan_inventory
+    type: io.kestra.plugin.core.log.Log
+    message: Scanning inventory levels across all warehouses...
+
+  - id: check_levels
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      total_items: "{{ random() * 10000 | round(0) }}"
+      low_stock_items: "{{ random() * 50 | round(0) }}"
+      out_of_stock: "{{ random() * 5 | round(0) }}"
+
+  - id: generate_alerts
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📦 Inventory Status Report
+      ==========================
+      Total Items: {{ outputs.check_levels.values.total_items }}
+      Low Stock Items: {{ outputs.check_levels.values.low_stock_items }}
+      Out of Stock: {{ outputs.check_levels.values.out_of_stock }}
+
+  - id: notify_purchasing
+    type: io.kestra.plugin.core.log.Log
+    message: Reorder notifications sent to purchasing team
+
+triggers:
+  - id: daily_check
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 7 * * *"
+    disabled: true

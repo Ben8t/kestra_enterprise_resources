@@ -1,5 +1,5 @@
 id: hello-world
-namespace: kestra
+namespace: acme
 description: Hello World
 
 inputs:
@@ -21,7 +21,7 @@ tasks:
   - id: hello_world
     type: io.kestra.plugin.core.log.Log
     message: |
-      Welcome to Kestra, {{ inputs.user }}! 
+      Welcome to Acme, {{ inputs.user }}! 
       We are {{ outputs.first_task.value }} to have you here!
 
 triggers:

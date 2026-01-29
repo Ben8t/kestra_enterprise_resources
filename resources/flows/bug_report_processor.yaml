@@ -1,0 +1,43 @@
+id: bug_report_processor
+namespace: acme.product
+description: Process and triage bug reports
+
+inputs:
+  - id: bug_title
+    type: STRING
+    required: true
+  - id: severity
+    type: SELECT
+    values:
+      - Critical
+      - High
+      - Medium
+      - Low
+    defaults: "Medium"
+  - id: reporter_email
+    type: STRING
+    required: true
+
+tasks:
+  - id: create_ticket
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      ticket_id: "BUG-{{ now() | date('yyyyMMdd') }}-{{ random() * 1000 | round(0) }}"
+
+  - id: assign_priority
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🐛 New Bug Report
+      Ticket: {{ outputs.create_ticket.values.ticket_id }}
+      Title: {{ inputs.bug_title }}
+      Severity: {{ inputs.severity }}
+
+  - id: assign_team
+    type: io.kestra.plugin.core.log.Log
+    message: Bug assigned to engineering team based on severity
+
+  - id: notify_reporter
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Confirmation sent to {{ inputs.reporter_email }}
+      Ticket ID: {{ outputs.create_ticket.values.ticket_id }}

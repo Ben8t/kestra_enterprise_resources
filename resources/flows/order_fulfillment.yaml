@@ -1,0 +1,45 @@
+id: order_fulfillment
+namespace: acme.operations
+description: Process and fulfill customer orders
+
+inputs:
+  - id: order_id
+    type: STRING
+    required: true
+  - id: customer_id
+    type: STRING
+    required: true
+  - id: items_count
+    type: INT
+    defaults: 1
+
+tasks:
+  - id: validate_order
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Processing order {{ inputs.order_id }}
+      Customer: {{ inputs.customer_id }}
+      Items: {{ inputs.items_count }}
+
+  - id: check_inventory
+    type: io.kestra.plugin.core.log.Log
+    message: Checking inventory availability...
+
+  - id: pick_and_pack
+    type: io.kestra.plugin.core.log.Log
+    message: Order picked and packed for shipping
+
+  - id: generate_shipping_label
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      tracking_number: "ACME-{{ now() | date('yyyyMMdd') }}-{{ random() * 100000 | round(0) }}"
+
+  - id: ship_order
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📮 Order Shipped!
+      Tracking Number: {{ outputs.generate_shipping_label.values.tracking_number }}
+      
+  - id: send_confirmation
+    type: io.kestra.plugin.core.log.Log
+    message: Shipping confirmation sent to customer {{ inputs.customer_id }}

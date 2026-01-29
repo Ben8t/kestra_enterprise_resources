@@ -1,0 +1,38 @@
+id: invoice_processing
+namespace: acme.finance
+description: Process and validate invoices
+
+inputs:
+  - id: invoice_number
+    type: STRING
+    required: true
+  - id: amount
+    type: FLOAT
+    required: true
+  - id: vendor_name
+    type: STRING
+    required: true
+
+tasks:
+  - id: validate_invoice
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Validating invoice: {{ inputs.invoice_number }}
+      Vendor: {{ inputs.vendor_name }}
+      Amount: $${{ inputs.amount }}
+
+  - id: check_approval_needed
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      needs_approval: "{{ inputs.amount > 5000 }}"
+      approver: "{{ inputs.amount > 5000 ? 'CFO' : 'Finance Manager' }}"
+
+  - id: process_payment
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Payment approved by {{ outputs.check_approval_needed.values.approver }}
+      Processing payment for invoice {{ inputs.invoice_number }}
+
+  - id: send_confirmation
+    type: io.kestra.plugin.core.log.Log
+    message: Payment confirmation sent to {{ inputs.vendor_name }}

@@ -1,0 +1,49 @@
+id: employee_onboarding
+namespace: acme.hr
+description: Automated employee onboarding workflow
+
+inputs:
+  - id: employee_name
+    type: STRING
+    required: true
+  - id: department
+    type: SELECT
+    values:
+      - Engineering
+      - Sales
+      - Marketing
+      - Finance
+      - Operations
+      - HR
+    required: true
+  - id: start_date
+    type: DATE
+    required: true
+
+tasks:
+  - id: create_employee_profile
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      employee_id: "EMP-{{ now() | date('yyyyMMdd') }}-{{ random() * 1000 | round(0) }}"
+
+  - id: setup_accounts
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      👤 Setting up accounts for {{ inputs.employee_name }}
+      Employee ID: {{ outputs.create_employee_profile.values.employee_id }}
+      Department: {{ inputs.department }}
+      Start Date: {{ inputs.start_date }}
+
+  - id: assign_equipment
+    type: io.kestra.plugin.core.log.Log
+    message: Laptop and equipment assigned to {{ inputs.employee_name }}
+
+  - id: schedule_orientation
+    type: io.kestra.plugin.core.log.Log
+    message: Orientation scheduled for {{ inputs.start_date }}
+
+  - id: notify_team
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Welcome email sent to {{ inputs.department }} team
+      Onboarding completed for {{ inputs.employee_name }}

@@ -1,0 +1,36 @@
+id: release_notification
+namespace: acme.product
+description: Notify stakeholders about new product releases
+
+inputs:
+  - id: version
+    type: STRING
+    required: true
+  - id: release_notes
+    type: STRING
+    defaults: "Bug fixes and improvements"
+
+tasks:
+  - id: prepare_announcement
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Preparing release announcement for version {{ inputs.version }}
+
+  - id: notify_internal_teams
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📢 New Release: v{{ inputs.version }}
+      ==============================
+      {{ inputs.release_notes }}
+
+  - id: update_documentation
+    type: io.kestra.plugin.core.log.Log
+    message: Documentation updated for v{{ inputs.version }}
+
+  - id: notify_customers
+    type: io.kestra.plugin.core.log.Log
+    message: Release notes sent to customers
+
+  - id: post_social_media
+    type: io.kestra.plugin.core.log.Log
+    message: Release announcement posted to social media channels

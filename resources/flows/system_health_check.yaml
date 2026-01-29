@@ -1,0 +1,38 @@
+id: system_health_check
+namespace: acme.operations
+description: Monitor system health and performance
+
+tasks:
+  - id: check_api_endpoints
+    type: io.kestra.plugin.core.log.Log
+    message: Checking API endpoint availability...
+
+  - id: check_database
+    type: io.kestra.plugin.core.log.Log
+    message: Checking database connections...
+
+  - id: check_services
+    type: io.kestra.plugin.core.log.Log
+    message: Checking microservices status...
+
+  - id: calculate_uptime
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      api_uptime: "{{ 99 + random() * 1 | round(3) }}"
+      db_response_time: "{{ random() * 50 | round(0) }}"
+      services_healthy: "{{ random() * 10 | round(0) }}"
+
+  - id: generate_report
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🏥 System Health Report
+      ========================
+      API Uptime: {{ outputs.calculate_uptime.values.api_uptime }}%
+      DB Response Time: {{ outputs.calculate_uptime.values.db_response_time }}ms
+      Healthy Services: {{ outputs.calculate_uptime.values.services_healthy }}/10
+
+triggers:
+  - id: hourly_check
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 * * * *"
+    disabled: true

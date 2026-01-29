@@ -1,5 +1,5 @@
 id: local_etl
-namespace: kestra.local
+namespace: acme.local
 
 inputs:
   - id: columns_to_keep

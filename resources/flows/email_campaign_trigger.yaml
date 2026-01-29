@@ -1,0 +1,38 @@
+id: email_campaign_trigger
+namespace: acme.marketing
+description: Trigger email marketing campaigns
+
+inputs:
+  - id: campaign_name
+    type: STRING
+    defaults: "Monthly Newsletter"
+  - id: target_segment
+    type: SELECT
+    values:
+      - All Customers
+      - Premium Customers
+      - Trial Users
+      - Inactive Users
+    defaults: "All Customers"
+
+tasks:
+  - id: validate_campaign
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Validating campaign: {{ inputs.campaign_name }}
+      Target segment: {{ inputs.target_segment }}
+
+  - id: calculate_audience
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      audience_size: "{{ random() * 10000 | round(0) }}"
+
+  - id: send_campaign
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📧 Sending campaign to {{ outputs.calculate_audience.values.audience_size }} recipients
+      Campaign: {{ inputs.campaign_name }}
+
+  - id: track_metrics
+    type: io.kestra.plugin.core.log.Log
+    message: Campaign sent successfully. Tracking metrics...

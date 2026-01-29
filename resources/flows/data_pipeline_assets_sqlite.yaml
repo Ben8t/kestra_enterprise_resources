@@ -1,0 +1,66 @@
+id: data_pipeline_assets_sqlite
+namespace: acme.company.data
+
+tasks:
+  - id: create_staging_layer_asset
+    type: io.kestra.plugin.jdbc.sqlite.Queries
+    url: jdbc:sqlite:myfile.db
+    outputDbFile: true
+    sql: |
+      CREATE TABLE IF NOT EXISTS trips (
+          VendorID INTEGER,
+          passenger_count INTEGER,
+          trip_distance REAL
+      );
+      
+      INSERT INTO trips (VendorID, passenger_count, trip_distance) VALUES
+      (1, 1, 1.5),
+      (1, 2, 2.3),
+      (2, 1, 0.8),
+      (2, 3, 3.1),
+      (1, 1, 1.2),
+      (2, 2, 2.5),
+      (1, 4, 4.2),
+      (2, 1, 0.9),
+      (1, 2, 2.1),
+      (2, 3, 3.7);
+    assets:
+      inputs: []
+      outputs:
+        - id: trips
+          type: io.kestra.plugin.ee.assets.Table
+          namespace: "{{flow.namespace}}"
+          metadata:
+            model_layer: staging
+            
+
+  - id: for_each
+    type: io.kestra.plugin.core.flow.ForEach
+    values:
+      - passenger_count
+      - trip_distance
+    tasks:
+      - id: create_mart_layer_asset
+        type: io.kestra.plugin.jdbc.sqlite.Queries
+        url: jdbc:sqlite:myfile.db
+        sqliteFile: "{{ outputs.create_staging_layer_asset.databaseUri }}"
+        outputDbFile: true
+        sql: |
+          CREATE TABLE IF NOT EXISTS avg_{{taskrun.value}} AS
+          SELECT AVG({{taskrun.value}}) AS avg_{{taskrun.value}} FROM trips;
+        assets:
+          inputs:
+            - id: trips
+          outputs:
+            - id: avg_{{taskrun.value}}
+              type: io.kestra.plugin.ee.assets.Table
+              namespace: "{{flow.namespace}}"
+              metadata:
+                model_layer: mart
+
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.sqlite
+    values:
+      url: jdbc:sqlite:myfile.db
+      fetchType: NONE
+

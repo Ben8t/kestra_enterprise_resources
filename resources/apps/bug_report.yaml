@@ -1,0 +1,46 @@
+id: bug_report_app
+type: io.kestra.plugin.ee.apps.Execution
+displayName: Bug Report Submission
+namespace: acme.product
+flowId: bug_report_processor
+tags:
+  - Product
+  - Support
+
+layout:
+  - on: OPEN
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## 🐛 Bug Report Submission
+          Submit and triage bug reports for the product team.
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
+        text: Submit Bug Report
+
+  - on: RUNNING
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Processing Bug Report...
+          Creating ticket and assigning to engineering team.
+      - type: io.kestra.plugin.ee.apps.core.blocks.Loading
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
+
+  - on: SUCCESS
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## ✅ Bug Report Created
+      
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Alert
+        style: SUCCESS
+        showIcon: true
+        content: Bug has been logged and assigned to the appropriate team.
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Button
+        text: Submit Another Bug
+        url: "{{ app.url }}"
+        style: DEFAULT

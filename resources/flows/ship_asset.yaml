@@ -1,0 +1,17 @@
+id: ship_asset
+namespace: acme.company.data
+
+tasks:
+  - id: asset
+    type: io.kestra.plugin.ee.assets.AssetShipper
+    assetExporters:
+      - id: file
+        type: io.kestra.plugin.ee.assets.FileAssetExporter
+        format: JSON
+      # - id: ol
+      #   type: io.kestra.plugin.ee.openlineage.OpenLineageAssetExporter
+      #   uri: http://host.docker.internal:5000
+      #   mappings:
+      #     io.kestra.plugin.ee.assets.Table:
+      #       namespace: namespace
+

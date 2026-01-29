@@ -1,0 +1,32 @@
+id: payroll_notification
+namespace: acme.hr
+description: Send payroll processing notifications
+
+tasks:
+  - id: calculate_payroll
+    type: io.kestra.plugin.core.log.Log
+    message: Calculating payroll for {{ now() | date('MMMM yyyy') }}
+
+  - id: generate_payslips
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      employee_count: "{{ random() * 200 | round(0) }}"
+      total_payroll: "$${{ random() * 500000 | round(2) }}"
+
+  - id: send_notifications
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      💵 Payroll Processing Complete
+      Month: {{ now() | date('MMMM yyyy') }}
+      Employees Paid: {{ outputs.generate_payslips.values.employee_count }}
+      Total Payroll: {{ outputs.generate_payslips.values.total_payroll }}
+
+  - id: update_records
+    type: io.kestra.plugin.core.log.Log
+    message: Payroll records updated in HR system
+
+triggers:
+  - id: monthly_payroll
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 8 25 * *"
+    disabled: true

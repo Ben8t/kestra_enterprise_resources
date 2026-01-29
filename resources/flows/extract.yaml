@@ -1,5 +1,5 @@
 id: extract
-namespace: kestra.weather
+namespace: acme.weather
 
 inputs:
 

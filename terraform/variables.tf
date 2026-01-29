@@ -96,3 +96,8 @@ variable "aws_s3_bucket" {
   type = string
   sensitive = true
 }
+
+variable "motherduck_token" {
+  type = string
+  sensitive = true
+}

@@ -1,0 +1,38 @@
+id: create_buckets
+namespace: acme.company.wescale
+
+inputs:
+  - id: teams
+    type: MULTISELECT
+    values:
+      - Business
+      - Data
+      - Finance
+      - Product
+
+tasks:
+  - id: for_each
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "{{ inputs.teams }}"
+    tasks:
+      - id: create_bucket
+        type: io.kestra.plugin.aws.cli.AwsCLI
+        commands:
+          - aws s3 mb s3://acme-{{ taskrun.value | slugify }}-bucket
+
+      - id: notify_email
+        type: io.kestra.plugin.resend.email.Send
+        from: "onboarding@resend.dev"
+        to:
+          - "bpimpaud@kestra.io"
+        subject: "Bucket created: acme-{{ taskrun.value | slugify }}-bucket"
+        html: "<h1>New bucket</h1><p>Bucket created: acme-{{ taskrun.value | slugify }}-bucket</p>"
+        apiKey: "{{ secret('RESEND_API_KEY') }}"
+
+pluginDefaults:
+  - type: io.kestra.plugin.aws
+    values:
+      accessKeyId: "{{ secret('AWS_ACCESS_KEY') }}"
+      secretKeyId: "{{ secret('AWS_SECRET_ACCESS_KEY') }}"
+      region: "{{ secret('AWS_REGION') }}"
+      allowFailure: true

@@ -1,0 +1,43 @@
+id: script_task_with_assets
+namespace: company.team
+
+tasks:
+  - id: download_orders
+    type: io.kestra.plugin.core.http.Download
+    uri: https://huggingface.co/datasets/kestra/datasets/raw/main/csv/orders.csv
+
+  - id: aggregate_orders
+    type: io.kestra.plugin.scripts.python.Script
+    dependencies:
+      - pandas
+      - kestra
+    inputFiles:
+      input.csv: "{{ outputs.download_orders.uri }}"
+    outputFiles:
+      - output.csv
+    script: |
+      from kestra import Kestra
+      import pandas as pd
+      # Path to your CSV file
+      csv_file_path = "input.csv"
+      # Read the CSV file using pandas
+      df = pd.read_csv(csv_file_path)
+      # Aggregate price and quantity per product_id
+      aggregated_df = df.groupby('product_id').agg({
+        'price': 'sum',
+        'quantity': 'sum'
+      }).reset_index()
+
+      # Write to output CSV file
+      aggregated_df.to_csv('output.csv', index=False)
+
+    assets:
+      inputs:
+        - id: raw_orders
+      outputs:
+        - id: aggregated_orders
+          type: io.kestra.plugin.ee.assets.File
+          metadata:
+            owner: data
+            file-system: kestra
+            

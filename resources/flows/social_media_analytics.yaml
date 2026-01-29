@@ -1,0 +1,34 @@
+id: social_media_analytics
+namespace: acme.marketing
+description: Aggregate social media performance metrics
+
+tasks:
+  - id: fetch_twitter_metrics
+    type: io.kestra.plugin.core.log.Log
+    message: Fetching Twitter/X metrics...
+
+  - id: fetch_linkedin_metrics
+    type: io.kestra.plugin.core.log.Log
+    message: Fetching LinkedIn metrics...
+
+  - id: aggregate_data
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      total_impressions: "{{ random() * 50000 | round(0) }}"
+      total_engagement: "{{ random() * 2000 | round(0) }}"
+      follower_growth: "{{ random() * 100 | round(0) }}"
+
+  - id: generate_insights
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📱 Social Media Weekly Report
+      ============================
+      Total Impressions: {{ outputs.aggregate_data.values.total_impressions }}
+      Total Engagement: {{ outputs.aggregate_data.values.total_engagement }}
+      Follower Growth: +{{ outputs.aggregate_data.values.follower_growth }}
+
+triggers:
+  - id: weekly_report
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 * * 1"
+    disabled: true

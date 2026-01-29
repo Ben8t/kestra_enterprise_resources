@@ -1,0 +1,31 @@
+id: monthly_sales_report
+namespace: acme.sales
+description: Generate monthly sales performance report
+
+tasks:
+  - id: fetch_sales_data
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Fetching sales data for {{ now() | date('MMMM yyyy') }}
+
+  - id: calculate_metrics
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      total_sales: "{{ random() * 100000 | round(2) }}"
+      num_customers: "{{ random() * 500 | round(0) }}"
+      avg_deal_size: "{{ random() * 5000 | round(2) }}"
+
+  - id: generate_report
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📊 Monthly Sales Report - {{ now() | date('MMMM yyyy') }}
+      ================================================
+      Total Sales: $${{ outputs.calculate_metrics.values.total_sales }}
+      Number of Customers: {{ outputs.calculate_metrics.values.num_customers }}
+      Average Deal Size: $${{ outputs.calculate_metrics.values.avg_deal_size }}
+
+triggers:
+  - id: monthly_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 1 * *"
+    disabled: true

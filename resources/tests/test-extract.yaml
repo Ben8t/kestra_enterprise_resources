@@ -1,6 +1,6 @@
 id: test-extract
 flowId: extract
-namespace: kestra.weather
+namespace: acme.weather
 testCases:
   - id: etl
     type: io.kestra.core.tests.flow.UnitTest

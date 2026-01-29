@@ -1,50 +1,47 @@
-id: kestra_agent
+id: employee_onboarding_app
 type: io.kestra.plugin.ee.apps.Execution
-displayName: Kestra Agent
-namespace: kestra
-flowId: kestra_agent
+displayName: Employee Onboarding
+namespace: acme.hr
+flowId: employee_onboarding
 tags:
-  - AI
+  - HR
+  - People Ops
 
 layout:
   - on: OPEN
     blocks:
       - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
         content: |
-          ## Kestra Agent 🤖
-          Ask Kestra to do something.
+          ## 👨‍💼 Employee Onboarding
+          Set up a new employee's accounts, equipment, and orientation.
       - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
       - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
-        text: Submit
+        text: Start Employee Onboarding
 
   - on: RUNNING
     blocks:
       - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
         content: |
-          ## Fetching results...
-          Don't close this window. The results will be displayed as soon as the processing is complete.
-      
+          ## Setting Up Employee...
+          Creating accounts and assigning equipment.
       - type: io.kestra.plugin.ee.apps.core.blocks.Loading
       - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
-      - type: io.kestra.plugin.ee.apps.execution.blocks.CancelExecutionButton
-        text: Cancel request
 
   - on: SUCCESS
     blocks:
       - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
         content: |
-          ## Here is the results requested
-
+          ## ✅ Employee Onboarding Complete!
+      
       - type: io.kestra.plugin.ee.apps.execution.blocks.Inputs
-
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+      
       - type: io.kestra.plugin.ee.apps.core.blocks.Alert
         style: SUCCESS
         showIcon: true
-
-      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
-
+        content: All systems are ready for the new employee's start date.
+      
       - type: io.kestra.plugin.ee.apps.core.blocks.Button
-        text: Submit new request
+        text: Onboard Another Employee
         url: "{{ app.url }}"
         style: DEFAULT
-

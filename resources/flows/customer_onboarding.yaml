@@ -1,0 +1,33 @@
+id: customer_onboarding
+namespace: acme.sales
+description: Automated customer onboarding workflow
+
+inputs:
+  - id: customer_name
+    type: STRING
+    required: true
+  - id: customer_email
+    type: STRING
+    required: true
+
+tasks:
+  - id: welcome_message
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Starting onboarding process for {{ inputs.customer_name }}
+      Email: {{ inputs.customer_email }}
+
+  - id: generate_customer_id
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      customer_id: "ACME-{{ now() | date('yyyyMMddHHmmss') }}"
+
+  - id: send_welcome_email
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      [SIMULATED] Welcome email sent to {{ inputs.customer_email }}
+      Customer ID: {{ outputs.generate_customer_id.values.customer_id }}
+
+  - id: complete
+    type: io.kestra.plugin.core.log.Log
+    message: Customer onboarding completed successfully!

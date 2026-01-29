@@ -1,0 +1,38 @@
+id: feature_feedback_aggregator
+namespace: acme.product
+description: Aggregate and analyze product feature feedback
+
+tasks:
+  - id: collect_feedback
+    type: io.kestra.plugin.core.log.Log
+    message: Collecting feedback from multiple sources...
+
+  - id: analyze_sentiment
+    type: io.kestra.plugin.core.log.Log
+    message: Analyzing sentiment and themes...
+
+  - id: generate_insights
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      total_feedback: "{{ random() * 200 | round(0) }}"
+      positive_sentiment: "{{ 60 + random() * 20 | round(0) }}"
+      top_requested_feature: "Dark Mode"
+
+  - id: create_report
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      💡 Feature Feedback Summary
+      ===========================
+      Total Feedback: {{ outputs.generate_insights.values.total_feedback }}
+      Positive Sentiment: {{ outputs.generate_insights.values.positive_sentiment }}%
+      Top Request: {{ outputs.generate_insights.values.top_requested_feature }}
+
+  - id: notify_product_team
+    type: io.kestra.plugin.core.log.Log
+    message: Weekly feedback report sent to product team
+
+triggers:
+  - id: weekly_aggregation
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 * * 5"
+    disabled: true

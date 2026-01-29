@@ -1,0 +1,27 @@
+id: generate_assets
+namespace: acme.qa
+inputs:
+  - id: assets
+    type: MULTISELECT
+    expression: "{{ assets(type='io.kestra.plugin.ee.assets.Table') | jq('.[].id') }}"
+tasks:
+  - id: for_each
+    type: io.kestra.plugin.core.flow.ForEach
+    values: '{{inputs.assets}}'
+    tasks:
+      - id: create_asset
+        type: io.kestra.plugin.core.log.Log
+        message: "{{ taskrun.value }}"
+        assets:
+          inputs:
+            - id: "{{ taskrun.value }}"
+          outputs:
+            - id: "{{ taskrun.value }}-versionA"
+              type: io.kestra.plugin.ee.assets.Table
+              namespace: "{{flow.namespace}}"
+            - id: "{{ taskrun.value }}-versionB"
+              type: io.kestra.plugin.ee.assets.Table
+              namespace: "{{flow.namespace}}"
+            - id: "{{ taskrun.value }}_versionC"
+              type: io.kestra.plugin.ee.assets.Table
+              namespace: "{{flow.namespace}}"

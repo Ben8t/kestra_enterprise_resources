@@ -1,0 +1,12 @@
+id: parent
+namespace: company.team
+
+tasks:
+  - id: hello
+    type: io.kestra.plugin.core.log.Log
+    message: Hello from parent
+
+  - id: subflow
+    type: io.kestra.plugin.core.flow.Subflow
+    flowId: child
+    namespace: company.team

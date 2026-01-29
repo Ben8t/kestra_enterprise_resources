@@ -1,5 +1,5 @@
 id: data_pipeline_assets
-namespace: kestra.company.data
+namespace: acme.company.data
 
 tasks:
   - id: create_staging_layer_asset

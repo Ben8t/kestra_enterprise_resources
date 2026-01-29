@@ -1,18 +1,18 @@
-id: extract_weather
+id: acme_agent
 type: io.kestra.plugin.ee.apps.Execution
-displayName: Extract Weather Data
-namespace: acme.weather
-flowId: extract
+displayName: Acme Agent
+namespace: acme
+flowId: acme_agent
 tags:
-  - Extract
+  - AI
 
 layout:
   - on: OPEN
     blocks:
       - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
         content: |
-          ## Extract Weather ⛅
-          Select the time and city you want to get the weather.
+          ## Acme Agent 🤖
+          Ask Acme to do something.
       - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
       - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
         text: Submit
@@ -21,7 +21,7 @@ layout:
     blocks:
       - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
         content: |
-          ## Fetching weather...
+          ## Fetching results...
           Don't close this window. The results will be displayed as soon as the processing is complete.
       
       - type: io.kestra.plugin.ee.apps.core.blocks.Loading
@@ -33,7 +33,7 @@ layout:
     blocks:
       - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
         content: |
-          ## Here is the weather requested
+          ## Here is the results requested
 
       - type: io.kestra.plugin.ee.apps.execution.blocks.Inputs
 
@@ -42,14 +42,6 @@ layout:
         showIcon: true
 
       - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
-
-      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
-        content: Find more App examples in the linked repository
-
-      - type: io.kestra.plugin.ee.apps.core.blocks.Button
-        text: App examples
-        url: https://github.com/kestra-io/enterprise-edition-examples/tree/main/apps
-        style: INFO
 
       - type: io.kestra.plugin.ee.apps.core.blocks.Button
         text: Submit new request

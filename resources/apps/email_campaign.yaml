@@ -1,0 +1,47 @@
+id: email_campaign_app
+type: io.kestra.plugin.ee.apps.Execution
+displayName: Email Campaign Manager
+namespace: acme.marketing
+flowId: email_campaign_trigger
+tags:
+  - Marketing
+  - Campaign
+
+layout:
+  - on: OPEN
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## 📧 Email Campaign Manager
+          Launch email campaigns to your customer segments.
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
+        text: Launch Campaign
+
+  - on: RUNNING
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Sending Campaign...
+          Calculating audience and sending emails.
+      - type: io.kestra.plugin.ee.apps.core.blocks.Loading
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
+
+  - on: SUCCESS
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## ✅ Campaign Sent Successfully!
+      
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Inputs
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Alert
+        style: SUCCESS
+        showIcon: true
+        content: Your email campaign has been sent and metrics are being tracked.
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Button
+        text: Launch Another Campaign
+        url: "{{ app.url }}"
+        style: DEFAULT

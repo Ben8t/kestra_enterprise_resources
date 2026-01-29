@@ -1,17 +1,17 @@
-resource "kestra_service_account" "kestra-service-account" {
-  name        = "kestra-service-account"
-  description = "Kestra Service Account"
+resource "kestra_service_account" "acme-service-account" {
+  name        = "acme-service-account"
+  description = "Acme Service Account"
 }
 
-resource "kestra_service_account_api_token" "kestra-service-account-api-token" {
-  name                = "kestra-service-account-api-token"
-  description         = "Kestra Service Account API Token"
-  service_account_id  = kestra_service_account.kestra-service-account.id
+resource "kestra_service_account_api_token" "acme-service-account-api-token" {
+  name                = "acme-service-account-api-token"
+  description         = "Acme Service Account API Token"
+  service_account_id  = kestra_service_account.acme-service-account.id
   max_age             = "P3D"
 }
 
-output "kestra_service_account_api_token" {
-  description = "The API token for the Kestra service account"
-  value       = kestra_service_account_api_token.kestra-service-account-api-token
+output "acme_service_account_api_token" {
+  description = "The API token for the Acme service account"
+  value       = kestra_service_account_api_token.acme-service-account-api-token
   sensitive   = true
 }

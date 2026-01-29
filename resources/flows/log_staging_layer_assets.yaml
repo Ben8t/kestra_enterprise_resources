@@ -1,5 +1,5 @@
 id: log_table_assets
-namespace: kestra.company.data
+namespace: acme.company.data
 
 tasks:
   - id: for_each_assets

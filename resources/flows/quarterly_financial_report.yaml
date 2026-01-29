@@ -1,0 +1,34 @@
+id: quarterly_financial_report
+namespace: acme.finance
+description: Generate quarterly financial statements
+
+tasks:
+  - id: gather_financial_data
+    type: io.kestra.plugin.core.log.Log
+    message: Gathering financial data for Q{{ now() | date('Q') }} {{ now() | date('yyyy') }}
+
+  - id: calculate_financials
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      revenue: "{{ random() * 1000000 | round(2) }}"
+      expenses: "{{ random() * 600000 | round(2) }}"
+      profit_margin: "{{ random() * 30 | round(2) }}"
+
+  - id: generate_report
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      💰 Quarterly Financial Report - Q{{ now() | date('Q') }} {{ now() | date('yyyy') }}
+      =============================================
+      Revenue: $${{ outputs.calculate_financials.values.revenue }}
+      Expenses: $${{ outputs.calculate_financials.values.expenses }}
+      Profit Margin: {{ outputs.calculate_financials.values.profit_margin }}%%
+
+  - id: distribute_report
+    type: io.kestra.plugin.core.log.Log
+    message: Report distributed to executive team and board members
+
+triggers:
+  - id: quarterly_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 8 1 1,4,7,10 *"
+    disabled: true

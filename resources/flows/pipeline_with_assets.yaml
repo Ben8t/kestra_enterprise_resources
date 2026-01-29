@@ -1,0 +1,27 @@
+id: pipeline_with_assets
+namespace: acme.company.data
+tasks:
+  - id: create_trips_table
+    type: io.kestra.plugin.jdbc.sqlite.Queries
+    url: jdbc:sqlite:myfile.db
+    outputDbFile: true
+    sql: |
+      CREATE TABLE IF NOT EXISTS my_trips_table (
+          VendorID INTEGER,
+          passenger_count INTEGER,
+          trip_distance REAL
+      );
+      
+      INSERT INTO my_trips_table (VendorID, passenger_count, trip_distance) VALUES
+      (1, 1, 1.5),
+      (1, 2, 2.3),
+      (2, 1, 0.8),
+      (2, 3, 3.1);
+    assets:
+      outputs:
+        - id: my_trips_table
+          namespace: "{{ flow.namespace }}"
+          type: io.kestra.plugin.ee.assets.Table
+          metadata:
+            database: sqlite
+            table: my_trips_table

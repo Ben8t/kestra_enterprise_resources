@@ -1,0 +1,46 @@
+id: customer_onboarding_app
+type: io.kestra.plugin.ee.apps.Execution
+displayName: Customer Onboarding
+namespace: acme.sales
+flowId: customer_onboarding
+tags:
+  - Sales
+  - CRM
+
+layout:
+  - on: OPEN
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## 👥 Customer Onboarding
+          Welcome! Start the automated onboarding process for a new Acme customer.
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
+        text: Start Onboarding
+
+  - on: RUNNING
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Processing Onboarding...
+          Please wait while we set up the customer account.
+      - type: io.kestra.plugin.ee.apps.core.blocks.Loading
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
+
+  - on: SUCCESS
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## ✅ Onboarding Complete!
+          The customer has been successfully onboarded.
+      
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Alert
+        style: SUCCESS
+        showIcon: true
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Button
+        text: Onboard Another Customer
+        url: "{{ app.url }}"
+        style: DEFAULT

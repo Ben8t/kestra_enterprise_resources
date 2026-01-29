@@ -1,0 +1,47 @@
+id: invoice_processing_app
+type: io.kestra.plugin.ee.apps.Execution
+displayName: Invoice Processing
+namespace: acme.finance
+flowId: invoice_processing
+tags:
+  - Finance
+  - Accounting
+
+layout:
+  - on: OPEN
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## 💰 Invoice Processing
+          Process and validate vendor invoices for payment.
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionForm
+      - type: io.kestra.plugin.ee.apps.execution.blocks.CreateExecutionButton
+        text: Process Invoice
+
+  - on: RUNNING
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## Validating Invoice...
+          Checking approval requirements and processing payment.
+      - type: io.kestra.plugin.ee.apps.core.blocks.Loading
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Logs
+
+  - on: SUCCESS
+    blocks:
+      - type: io.kestra.plugin.ee.apps.core.blocks.Markdown
+        content: |
+          ## ✅ Invoice Processed Successfully
+      
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Inputs
+      - type: io.kestra.plugin.ee.apps.execution.blocks.Outputs
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Alert
+        style: SUCCESS
+        showIcon: true
+        content: Payment has been processed and confirmation sent.
+      
+      - type: io.kestra.plugin.ee.apps.core.blocks.Button
+        text: Process Another Invoice
+        url: "{{ app.url }}"
+        style: DEFAULT

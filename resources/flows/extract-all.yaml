@@ -1,8 +1,13 @@
 id: extract-all
-namespace: kestra.weather
+namespace: acme.weather
+
+concurrency:
+  behavior: QUEUE
+  limit: 5
 
 labels:
-  kind: control
+  - key: kind
+    value: control
 
 tasks:
 
@@ -13,7 +18,7 @@ tasks:
 
       - id: subflow
         type: io.kestra.plugin.core.flow.Subflow
-        namespace: kestra.weather
+        namespace: acme.weather
         flowId: extract
         inputs:
           time: '{{ trigger.date ?? now() | date("yyyy-MM-dd") }}'
@@ -23,3 +28,4 @@ triggers:
   - id: schedule
     type: io.kestra.plugin.core.trigger.Schedule
     cron: "@daily"
+    allowConcurrent: true

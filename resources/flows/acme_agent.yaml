@@ -1,5 +1,5 @@
-id: kestra_agent
-namespace: kestra
+id: acme_agent
+namespace: acme
 inputs:
   - id: prompt
     type: STRING
