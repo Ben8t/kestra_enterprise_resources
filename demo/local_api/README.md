@@ -5,8 +5,8 @@ Serve `data/data.json` over HTTP.
 ## Quick start
 
 ```bash
-# from repo root, go into this folder (recommended)
-cd local_api
+# from repo root, go into this folder
+cd demo/local_api
 
 # install uv if needed
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -19,10 +19,6 @@ uv venv
 uv run uvicorn main:app --host 0.0.0.0 --port 28080 --reload
 # or without reload
 uv run uvicorn main:app --host 0.0.0.0 --port 28080
-
-# If you prefer to stay at repo root, target the project path:
-cd ..
-uv run --project http_api uvicorn http_api.main:app --host 0.0.0.0 --port 28080 --reload
 ```
 
 - **API**: `http://localhost:28080`
