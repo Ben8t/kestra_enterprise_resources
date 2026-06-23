@@ -69,3 +69,17 @@ resource "kestra_namespace_secret" "motherduck_token" {
   secret_value = var.motherduck_token
   depends_on   = [kestra_namespace.acme]
 }
+
+resource "kestra_namespace_secret" "slack_bot_token" {
+  namespace    = kestra_namespace.acme.id
+  secret_key   = "SLACK_BOT_TOKEN"
+  secret_value = var.slack_bot_token
+  depends_on   = [kestra_namespace.acme]
+}
+
+resource "kestra_namespace_secret" "slack_signing_secret" {
+  namespace    = kestra_namespace.acme.id
+  secret_key   = "SLACK_SIGNING_SECRET"
+  secret_value = var.slack_signing_secret
+  depends_on   = [kestra_namespace.acme]
+}

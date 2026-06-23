@@ -1,0 +1,17 @@
+id: wren_663468
+namespace: acme
+
+triggers:
+  - id: slack_mention
+    key: test
+    type: io.kestra.plugin.slack.app.core.Trigger
+    botToken: "{{ secret('SLACK_BOT_TOKEN') }}"
+    signingSecret: "{{ secret('SLACK_SIGNING_SECRET') }}"
+
+tasks:
+  - id: respond_to_mention
+    type: io.kestra.plugin.slack.app.chats.Post
+    token: "{{ secret('SLACK_BOT_TOKEN') }}"
+    channel: "{{ trigger.body.event.channel }}"
+    messageText: "Hello! You mentioned me."
+    timestamp: "{{ trigger.body.event.ts }}"

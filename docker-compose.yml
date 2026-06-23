@@ -5,6 +5,16 @@ volumes:
     driver: local
 
 services:
+  # mitmproxy:
+  #   # networks:
+  #   #   - tutorial_default
+  #   image: mitmproxy/mitmproxy
+  #   command: mitmweb --web-host 0.0.0.0 --set web_password="VMware1!"
+  #   ports:
+  #     - "8000:8080"           # Proxy (accessible from Docker network & host)
+  #     - "127.0.0.1:8001:8081" # Web UI (localhost-only access)
+  #   volumes:
+  #     - ./mitmproxy:/home/mitmproxy/.mitmproxy
   postgres:
     image: postgres
     volumes:
@@ -20,71 +30,31 @@ services:
       retries: 10
     ports:
       - "55432:5432"
-  kestra: 
+  kestra:
     image: registry.kestra.io/docker/kestra-ee:develop
     pull_policy: never
     user: "root"
-    command: server standalone --worker-thread=128
+    command: server standalone --worker-thread=128 --config /app/application.yaml
     volumes:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kestra-wd:/tmp/kestra-wd
+      - ./app/ssl:/app/ssl
+      - ./application.yaml:/app/application.yaml:ro
     environment:
-      KESTRA_CONFIGURATION: |
-        datasources:
-          postgres:
-            url: jdbc:postgresql://postgres:5432/kestra
-            driverClassName: org.postgresql.Driver
-            username: ${POSTGRES_USER}
-            password: ${POSTGRES_PASSWORD}
-        kestra:
-          ai:
-           type: openai
-           openai: 
-             api-key: ${OPENAI_API_KEY}
-             temperature: 1
-          encryption:
-            secret-key: "${KESTRA_ENCRYPTION_SECRET_KEY}"
-          # security:
-          #   super-admin:
-          #     username: ${KESTRA_USER}
-          #     password: ${KESTRA_PASSWORD}
-          environment:
-            name: prod
-            color: "#2C0059"
-          secret:
-            type: aws-secret-manager
-            aws-secret-manager:
-              access-key-id: ${AWS_ACCESS_KEY}
-              secret-key-id: ${AWS_SECRET_ACCESS_KEY}
-              region: ${AWS_REGION}
-  
-          ee:
-            license:
-              id: ${KESTRA_LICENSE_ID}
-              fingerprint: ${KESTRA_LICENSE_FINGERPRINT}
-              key: | 
-                ${KESTRA_LICENSE_KEY}
-          repository:
-            type: postgres
-          storage:
-            type: s3
-            s3:
-              access-key: ${AWS_ACCESS_KEY}
-              secret-key: ${AWS_SECRET_ACCESS_KEY}
-              region: ${AWS_REGION}
-              bucket: ${AWS_S3_BUCKET}
-          queue:
-            type: postgres
-          tasks:
-            tmp-dir:
-              path: /tmp/kestra-wd/tmp
-          url: http://localhost:8080/
-          plugins:
-            configurations:
-              - type: io.kestra.plugin.scripts.runner.docker.Docker
-                values:
-                  volume-enabled: true # 👈 this is the relevant setting
+      # JAVA_OPTS: "-Djavax.net.ssl.trustStore=/app/ssl/truststore.jks -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=JKS -Dhttp.proxyHost=mitmproxy -Dhttp.proxyPort=8080 -Dhttps.proxyHost=mitmproxy -Dhttps.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.0.0.1|your.nexus.domain.com"
+      # Config lives in ./application.yaml; these are the ${...} placeholders it resolves at runtime.
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      KESTRA_WORKER_REGISTRATION_TOKEN: ${KESTRA_WORKER_REGISTRATION_TOKEN}
+      KESTRA_JDBC_SECRET: ${KESTRA_JDBC_SECRET}
+      KESTRA_ENCRYPTION_SECRET_KEY: ${KESTRA_ENCRYPTION_SECRET_KEY}
+      KESTRA_LICENSE_ID: ${KESTRA_LICENSE_ID}
+      KESTRA_LICENSE_FINGERPRINT: ${KESTRA_LICENSE_FINGERPRINT}
+      KESTRA_LICENSE_KEY: ${KESTRA_LICENSE_KEY}
     ports:
       - "8080:8080"
       - "8090:8081"
@@ -92,7 +62,38 @@ services:
       postgres:
         condition: service_started
 
-networks: 
-  default: 
-    external: 
-      name: kestra-net
+  ftp:
+    image: delfer/alpine-ftp-server
+    environment:
+      USERS: "demo|demo"
+      ADDRESS: "localhost"
+    ports:
+      - "2121:21"
+      - "21000-21010:21000-21010"
+
+  ftp-ui:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./demo/ftp-ui:/app
+    command: sh -c "pip install --quiet --no-cache-dir flask && python app.py"
+    environment:
+      FTP_HOST: ftp
+      FTP_PORT: "21"
+      FTP_USER: demo
+      FTP_PASS: demo
+      KESTRA_URL: http://localhost:8080/ui/main/namespaces/edit/acme.demo/executions
+    ports:
+      - "8088:8088"
+    depends_on:
+      - ftp
+
+# networks:
+#   default:
+#     external:
+#       name: kestra-net
+
+# networks:
+#   tutorial_default:
+#     name: tutorial_default
+#     driver: bridge
