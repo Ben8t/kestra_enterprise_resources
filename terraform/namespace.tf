@@ -55,3 +55,9 @@ resource "kestra_namespace" "acme_product" {
   description     = "Product Team Namespace"
   depends_on   = [kestra_namespace.acme]
 }
+
+resource "kestra_namespace" "acme_training" {
+  namespace_id    = "acme.training"
+  description     = "Training Namespace"
+  depends_on   = [kestra_namespace.acme]
+}

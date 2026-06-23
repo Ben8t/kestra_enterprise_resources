@@ -15,3 +15,9 @@ resource "kestra_kv" "acme_base_url" {
   value = var.kestra_base_url
   namespace = kestra_namespace.acme.id
 }
+
+resource "kestra_kv" "acme_training_configuration_file" {
+  key       = "configuration_file"
+  value     = "openid-configuration"
+  namespace = kestra_namespace.acme_training.id
+}
