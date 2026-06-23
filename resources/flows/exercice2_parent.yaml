@@ -1,0 +1,38 @@
+id: exercice2_parent
+namespace: acme.training
+
+tasks:
+  - id: if
+    type: io.kestra.plugin.core.flow.If
+    condition: '{{ trigger.value.email | endsWith("@hotmail.fr") }}'
+    then:
+      - id: subflow
+        type: io.kestra.plugin.core.flow.Subflow
+        flowId: gmail_processing
+        namespace: acme.training
+        inputs:
+          email_value: "{{ trigger.value.email }}"
+    else:
+      - id: log
+        type: io.kestra.plugin.core.log.Log
+        message: "The email is not a gmail account"
+
+triggers:
+  - id: datagen
+    type: io.kestra.plugin.datagen.core.Trigger
+    interval: PT5S
+    batchSize: 1
+    disabled: true
+    store: false
+    generator:
+      type: io.kestra.plugin.datagen.generators.JsonObjectGenerator
+      locale: ["fr", "FR"]
+      value:
+        name: "#{name.fullName}"
+        email: "#{internet.emailAddress}"
+        age: 30
+        address:
+          city: "#{address.city}"
+          zip: "#{address.zipCode}"
+        skills: ["#{job.keySkills}", "#{job.position}", "hardcoded"]
+        ts: "{{ now() }}"
