@@ -1,3 +1,6 @@
+# macOS
+.DS_Store
+
 gcp_service_account/
 
 # Terraform lock/state and secrets
@@ -46,3 +49,4 @@ env/
 
 # uv
 .uv/
+.gstack/

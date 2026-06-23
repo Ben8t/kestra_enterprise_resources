@@ -12,22 +12,22 @@ inputs:
 
 tasks:
   - id: for_each
-    type: io.kestra.plugin.core.flow.ForEach
+    type: io.kestra.plugin.core.flow.Loop
     values: "{{ inputs.teams }}"
     tasks:
       - id: create_bucket
         type: io.kestra.plugin.aws.cli.AwsCLI
         commands:
-          - aws s3 mb s3://acme-{{ taskrun.value | slugify }}-bucket
+          - aws s3 mb s3://acme-{{ item.value | slugify }}-bucket
 
-      - id: notify_email
-        type: io.kestra.plugin.resend.email.Send
-        from: "onboarding@resend.dev"
-        to:
-          - "bpimpaud@kestra.io"
-        subject: "Bucket created: acme-{{ taskrun.value | slugify }}-bucket"
-        html: "<h1>New bucket</h1><p>Bucket created: acme-{{ taskrun.value | slugify }}-bucket</p>"
-        apiKey: "{{ secret('RESEND_API_KEY') }}"
+      # - id: notify_email
+      #   type: io.kestra.plugin.resend.email.Send
+      #   from: "onboarding@resend.dev"
+      #   to:
+      #     - "bpimpaud@kestra.io"
+      #   subject: "Bucket created: acme-{{ item.value | slugify }}-bucket"
+      #   html: "<h1>New bucket</h1><p>Bucket created: acme-{{ item.value | slugify }}-bucket</p>"
+      #   apiKey: "{{ secret('RESEND_API_KEY') }}"
 
 pluginDefaults:
   - type: io.kestra.plugin.aws

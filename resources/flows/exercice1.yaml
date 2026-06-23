@@ -1,0 +1,16 @@
+id: exercice1
+namespace: acme.training
+
+inputs:
+  - id: domain_url
+    type: STRING
+    defaults: scm.saas.cagip.group.gca
+
+tasks:
+  - id: open_conf
+    type: "io.kestra.plugin.core.http.Request"
+    uri: "https://{{ inputs.domain_url }}/.well-known/{{ kv('configuration_file') }}"
+
+  - id: print_status
+    type: io.kestra.plugin.core.log.Log
+    message: '{{ outputs.open_conf.body }}'

@@ -12,7 +12,7 @@ labels:
 tasks:
 
   - id: run_extract
-    type: io.kestra.plugin.core.flow.ForEach
+    type: io.kestra.plugin.core.flow.Loop
     values: '["Paris", "Berlin"]'
     tasks:
 
@@ -22,7 +22,7 @@ tasks:
         flowId: extract
         inputs:
           time: '{{ trigger.date ?? now() | date("yyyy-MM-dd") }}'
-          city: "{{ taskrun.value }}"
+          city: "{{ item.value }}"
 
 triggers:
   - id: schedule

@@ -18,6 +18,14 @@ resource "kestra_group" "example" {
   description = "Data engineering team with access to flows and executions"
 }
 
+resource "kestra_group" "test" {
+  name = "TEST"
+}
+
+resource "kestra_group" "newgroup" {
+  name = "newGroup"  
+}
+
 resource "kestra_binding" "example" {
   type        = "GROUP"
   external_id = kestra_group.example.id
@@ -165,4 +173,145 @@ resource "kestra_user" "priya_sharma" {
   first_name  = "Priya"
   last_name   = "Sharma"
   groups      = [kestra_group.infrastructure.id]
+}
+
+resource "kestra_role" "qa_full_crud" {
+  name        = "QA Full CRUD"
+  description = "Role with full CRUD permissions for QA"
+
+  permissions {
+    type        = "FLOW"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "EXECUTION"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "TEMPLATE"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "NAMESPACE"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "KVSTORE"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "DASHBOARD"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "SECRET"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "GROUP"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "ROLE"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "BINDING"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "AUDITLOG"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "BLUEPRINT"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "IMPERSONATE"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "SETTING"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "APP"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "APPEXECUTION"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "TEST"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "ASSET"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "USER"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "TENANT_ACCESS"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "SERVICE_ACCOUNT"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "INVITATION"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+
+  permissions {
+    type        = "GROUP_MEMBERSHIP"
+    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  }
+}
+
+
+resource "kestra_user" "qa_user" {
+  email       = "qa.user@acme.com"
+  namespace   = "acme"
+  description = "QA Engineer"
+  first_name  = "QA"
+  last_name   = "User"
+  groups      = [kestra_group.infrastructure.id]
+}
+
+resource "kestra_binding" "qa_user_full_crud" {
+  type        = "USER"
+  external_id = kestra_user.qa_user.id
+  role_id     = kestra_role.qa_full_crud.id
+}
+
+resource "kestra_user_password" "qa_user_password" {
+  user_id  = kestra_user.qa_user.id
+  password = var.qa_user_password
 }

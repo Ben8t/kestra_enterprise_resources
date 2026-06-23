@@ -1,0 +1,162 @@
+# Kestra EE application configuration.
+# Split out of docker-compose.yml's KESTRA_CONFIGURATION env var.
+# Loaded by the container via: server standalone --config /app/application.yaml
+# ${VAR} placeholders are resolved by Micronaut from environment variables
+# passed to the kestra service in docker-compose.yml (and defined in .env).
+
+# Optional internal API / SSL / forward-proxy settings, kept for reference:
+# micronaut:
+#   http:
+#     services:
+#       api:
+#         url: https://develop.api.internal.kestra.io
+# server:
+#   ssl:
+#     clientAuthentication: want
+#     trustStore:
+#       path: "file:/app/ssl/truststore.jks"
+#       password: "changeit"
+#       type: "JKS"
+# micronaut:
+#   http:
+#     client:
+#       proxy-address: "mitmproxy:8080"
+#       proxy-type: HTTP
+
+micronaut:
+  security:
+    oauth2:
+      enabled: true
+      clients:
+        keycloak:
+          client-id: "kestraclient"
+          client-secret: "${KEYCLOAK_CLIENT_SECRET}"
+          openid:
+            issuer: "https://lemur-6.cloud-iam.com/auth/realms/test"
+            # issuer: "https://lemur-1.cloud-iam.com/auth/realms/kestra-test123"
+          scopes: ["openid", "profile", "email", "roles", "groups"]
+    endpoints:
+      logout:
+        get-allowed: true
+
+datasources:
+  postgres:
+    url: jdbc:postgresql://postgres:5432/kestra
+    driverClassName: org.postgresql.Driver
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+kestra:
+  ai:
+    providers:
+      - id: gemini
+        display-name: Gemini
+        type: gemini
+        isDefault: false
+        configuration:
+          model-name: gemini-2.5-flash
+          api-key: ${GEMINI_API_KEY}
+      - id: gpt
+        display-name: Open AI
+        type: openai
+        isDefault: true
+        configuration:
+          model-name: gpt-5.4-mini
+          api-key: ${OPENAI_API_KEY}
+
+  encryption:
+    secret-key: "${KESTRA_ENCRYPTION_SECRET_KEY}"
+
+  # security:
+  #   super-admin:
+  #     username: ${KESTRA_USER}
+  #     password: ${KESTRA_PASSWORD}
+  #     tenantAdminAccess: main
+  security:
+    defaultRole:
+      name: Editor
+      description: Default Editor role
+      permissions:
+        FLOW:
+          [
+            "VIEW",
+            "LIST",
+            "CREATE",
+            "UPDATE",
+            "DELETE",
+            "EXECUTE",
+            "DISABLE",
+            "ENABLE",
+            "VALIDATE",
+            "EXPORT",
+            "IMPORT",
+          ]
+        EXECUTION:
+          [
+            "VIEW",
+            "LIST",
+            "UPDATE",
+            "DELETE",
+            "RESTART",
+            "KILL",
+            "REPLAY",
+            "PAUSE",
+            "RESUME",
+            "CHANGE_LABELS",
+            "ACCESS_LOGS",
+            "ACCESS_OUTPUTS",
+            "ACCESS_FILES",
+            "EXPORT",
+            "UNQUEUE",
+            "FORCE_RUN",
+            "FOLLOW",
+          ]
+    oidc:
+      groups-claim-path: "groups"
+
+  worker:
+    auth:
+      registrationToken: ${KESTRA_WORKER_REGISTRATION_TOKEN}
+
+  environment:
+    name: prod
+    color: "#2C0059"
+
+  secret:
+    type: jdbc
+    jdbc:
+      secret: "${KESTRA_JDBC_SECRET}"
+
+  ee:
+    license:
+      license-check-frequency: PT2M
+      id: ${KESTRA_LICENSE_ID}
+      fingerprint: ${KESTRA_LICENSE_FINGERPRINT}
+      key: |
+        ${KESTRA_LICENSE_KEY}
+    worker:
+      auth:
+        enabled: false
+
+  queue:
+    type: postgres
+
+  repository:
+    type: postgres
+
+  storage:
+    type: local
+    local:
+      base-path: "/app/storage"
+
+  tasks:
+    tmp-dir:
+      path: /tmp/kestra-wd/tmp
+
+  url: http://localhost:8080/
+
+  plugins:
+    configurations:
+      - type: io.kestra.plugin.scripts.runner.docker.Docker
+        values:
+          volume-enabled: true # 👈 this is the relevant setting

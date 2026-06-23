@@ -12,20 +12,20 @@ inputs:
 
 tasks:
   - id: for_each
-    type: io.kestra.plugin.core.flow.ForEach
+    type: io.kestra.plugin.core.flow.Loop
     values: "{{ inputs.teams }}"
     tasks:
       - id: create_bucket
         type: io.kestra.plugin.aws.cli.AwsCLI
         commands:
-          - aws s3 mb s3://acme-{{ taskrun.value | slugify }}-bucket
+          - aws s3 mb s3://acme-{{ item.value | slugify }}-bucket
         assets:
           outputs:
-            - id: acme-{{ taskrun.value | slugify }}-bucket
+            - id: acme-{{ item.value | slugify }}-bucket
               type: AWS_BUCKET
               metadata:
                 provider: s3
-                address: s3://acme-{{ taskrun.value | slugify }}-bucket
+                address: s3://acme-{{ item.value | slugify }}-bucket
 
 pluginDefaults:
   - type: io.kestra.plugin.aws

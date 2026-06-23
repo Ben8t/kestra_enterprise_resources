@@ -35,7 +35,7 @@ tasks:
             
 
   - id: for_each
-    type: io.kestra.plugin.core.flow.ForEach
+    type: io.kestra.plugin.core.flow.Loop
     values:
       - passenger_count
       - trip_distance
@@ -46,13 +46,13 @@ tasks:
         sqliteFile: "{{ outputs.create_staging_layer_asset.databaseUri }}"
         outputDbFile: true
         sql: |
-          CREATE TABLE IF NOT EXISTS avg_{{taskrun.value}} AS
-          SELECT AVG({{taskrun.value}}) AS avg_{{taskrun.value}} FROM trips;
+          CREATE TABLE IF NOT EXISTS avg_{{item.value}} AS
+          SELECT AVG({{item.value}}) AS avg_{{item.value}} FROM trips;
         assets:
           inputs:
             - id: trips
           outputs:
-            - id: avg_{{taskrun.value}}
+            - id: avg_{{item.value}}
               type: io.kestra.plugin.ee.assets.Table
               namespace: "{{flow.namespace}}"
               metadata:

@@ -1,0 +1,11 @@
+id: gmail_processing
+namespace: acme.training
+
+inputs:
+  - id: email_value
+    type: STRING
+
+tasks:
+  - id: send_email
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ inputs.email_value }}"

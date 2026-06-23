@@ -3,25 +3,26 @@ namespace: acme.qa
 inputs:
   - id: assets
     type: MULTISELECT
+    values: []
     expression: "{{ assets(type='io.kestra.plugin.ee.assets.Table') | jq('.[].id') }}"
 tasks:
   - id: for_each
-    type: io.kestra.plugin.core.flow.ForEach
+    type: io.kestra.plugin.core.flow.Loop
     values: '{{inputs.assets}}'
     tasks:
       - id: create_asset
         type: io.kestra.plugin.core.log.Log
-        message: "{{ taskrun.value }}"
+        message: "{{ item.value }}"
         assets:
           inputs:
-            - id: "{{ taskrun.value }}"
+            - id: "{{ item.value }}"
           outputs:
-            - id: "{{ taskrun.value }}-versionA"
+            - id: "{{ item.value }}-versionA"
               type: io.kestra.plugin.ee.assets.Table
               namespace: "{{flow.namespace}}"
-            - id: "{{ taskrun.value }}-versionB"
+            - id: "{{ item.value }}-versionB"
               type: io.kestra.plugin.ee.assets.Table
               namespace: "{{flow.namespace}}"
-            - id: "{{ taskrun.value }}_versionC"
+            - id: "{{ item.value }}_versionC"
               type: io.kestra.plugin.ee.assets.Table
               namespace: "{{flow.namespace}}"
