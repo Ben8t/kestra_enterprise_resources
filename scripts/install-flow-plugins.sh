@@ -19,7 +19,7 @@
 #   * /app/plugins is NOT a mounted volume here, so installs survive `docker compose
 #     restart` but are LOST on container recreate (`down`/`up`, image change). For a
 #     durable setup, mount `./plugins:/app/plugins` or bake the jars into the image.
-#   * Versions: the instance is 2.0.0-rc2, but the matching rc plugin jars live on the
+#   * Versions: the instance is 2.0.0-rc12, but the matching rc plugin jars live on the
 #     authenticated registry.kestra.io (HTTP 401 without license creds). LATEST pulls
 #     compatible stable jars from Maven Central instead.
 #
