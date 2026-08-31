@@ -50,16 +50,23 @@ kestra:
   ai:
     providers:
       - id: gemini
-        display-name: Gemini
+        display-name: Gemini 2.5 Flash
         type: gemini
         isDefault: false
         configuration:
           model-name: gemini-2.5-flash
           api-key: ${GEMINI_API_KEY}
-      - id: gpt
-        display-name: Open AI
-        type: openai
+      - id: gemini-high
+        display-name: Gemini 3.6 Flash
+        type: gemini
         isDefault: true
+        configuration:
+          model-name: gemini-3.6-flash
+          api-key: ${GEMINI_API_KEY}
+      - id: gpt
+        display-name: GPT-5.4 Mini
+        type: openai
+        isDefault: false
         configuration:
           model-name: gpt-5.4-mini
           api-key: ${OPENAI_API_KEY}
@@ -67,12 +74,13 @@ kestra:
   encryption:
     secret-key: "${KESTRA_ENCRYPTION_SECRET_KEY}"
 
-  # security:
-  #   super-admin:
-  #     username: ${KESTRA_USER}
-  #     password: ${KESTRA_PASSWORD}
-  #     tenantAdminAccess: main
   security:
+    # `super-admin` is the pre-2.0 name and is deprecated — the server logs a
+    # warning and tells you to use `instance-owner`.
+    instance-owner:
+      username: "${KESTRA_USER}"
+      password: "${KESTRA_PASSWORD}"
+      tenantAdminAccess: main
     defaultRole:
       name: Editor
       description: Default Editor role
@@ -117,6 +125,17 @@ kestra:
   worker:
     auth:
       registrationToken: ${KESTRA_WORKER_REGISTRATION_TOKEN}
+    # Which controller a worker dials over gRPC. In EE v2 a worker is not
+    # self-sufficient: it connects to a controller (the standalone server runs
+    # one, listening on 50051) rather than reading the queue directly.
+    # localhost covers the standalone's own embedded worker. A worker running
+    # outside this container would override KESTRA_CONTROLLER_HOST.
+    controllers:
+      type: STATIC
+      static:
+        endpoints:
+          - host: ${KESTRA_CONTROLLER_HOST:localhost}
+            port: 50051
 
   environment:
     name: prod
@@ -136,8 +155,13 @@ kestra:
         ${KESTRA_LICENSE_KEY}
     worker:
       auth:
-        enabled: false
-
+        # Server-side enforcement of worker registration tokens. With this on,
+        # a worker's kestra.worker.auth.registrationToken decides which worker
+        # group it joins; with it off the token is ignored and every worker
+        # falls back to `default`.
+        enabled: true
+    deploy:
+      allow-insecure-url: true
   queue:
     type: postgres
 
