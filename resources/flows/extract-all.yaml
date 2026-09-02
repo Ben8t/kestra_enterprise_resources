@@ -1,9 +1,25 @@
 id: extract-all
 namespace: acme.weather
+description: Daily control flow — runs the weather extract subflow for each city.
 
 concurrency:
   behavior: QUEUE
   limit: 5
+
+sla:
+  - id: max_duration
+    type: MAX_DURATION
+    duration: PT15M
+    behavior: FAIL
+    labels:
+      sla: miss
+      reason: durationExceeded
+
+errors:
+  - id: log_failure
+    type: io.kestra.plugin.core.log.Log
+    level: ERROR
+    message: "extract-all FAILED — execution {{ execution.id }} ({{ flow.namespace }}.{{ flow.id }})"
 
 labels:
   - key: kind
@@ -28,4 +44,4 @@ triggers:
   - id: schedule
     type: io.kestra.plugin.core.trigger.Schedule
     cron: "@daily"
-    allowConcurrent: true
+    allowConcurrent: false

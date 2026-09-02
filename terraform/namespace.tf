@@ -2,15 +2,34 @@ resource "kestra_namespace" "acme" {
   namespace_id    = "acme"
   description     = "Base Acme Namespace"
   plugin_defaults = <<EOT
-- type: io.kestra.plugin.git
+- forced: false
+  type: io.kestra.plugin.git
   values:
-    password: "{{ secret('GITHUB_TOKEN') }}"
+    password: '{{ secret(''GITHUB_TOKEN'') }}'
 EOT
 }
 
 resource "kestra_namespace" "acme_weather" {
   namespace_id    = "acme.weather"
   description     = "Weather Namespace"
+  plugin_defaults = <<EOT
+- forced: false
+  type: io.kestra.plugin.core.http
+  values:
+    retry:
+      interval: PT5S
+      maxAttempts: 3
+      maxInterval: PT1M
+      type: exponential
+- forced: false
+  type: io.kestra.plugin.jdbc.duckdb
+  values:
+    retry:
+      interval: PT5S
+      maxAttempts: 3
+      maxInterval: PT1M
+      type: exponential
+EOT
   depends_on   = [kestra_namespace.acme]
 }
 

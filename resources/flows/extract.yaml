@@ -1,5 +1,6 @@
 id: extract
 namespace: acme.weather
+description: Fetch hourly temperature for a city/date and normalize it to CSV.
 
 inputs:
   - id: time
@@ -19,6 +20,7 @@ tasks:
   - id: geocoding
     type: io.kestra.plugin.core.http.Request
     uri: https://geocoding-api.open-meteo.com/v1/search?name={{inputs.city | urlencode}}&count=1&language=en&format=json
+    timeout: PT30S
 
   - id: geo_output
     type: io.kestra.plugin.core.output.OutputValues
@@ -29,9 +31,12 @@ tasks:
   - id: download_weather_data
     type: io.kestra.plugin.core.http.Download
     uri: https://archive-api.open-meteo.com/v1/archive?latitude={{ outputs.geo_output.values.latitude }}&longitude={{ outputs.geo_output.values.longitude }}&start_date={{inputs.time}}&end_date={{inputs.time}}&hourly=temperature_2m
+    timeout: PT30S
 
   - id: normalize_data
     type: io.kestra.plugin.jdbc.duckdb.Queries
+    description: Flatten the hourly arrays and write a per-city CSV (deterministic overwrite).
+    timeout: PT2M
     store: true
     inputFiles:
       data.json: "{{ outputs.download_weather_data.uri }}"
