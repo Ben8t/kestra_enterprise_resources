@@ -57,10 +57,3 @@ tasks:
               namespace: "{{flow.namespace}}"
               metadata:
                 model_layer: mart
-
-pluginDefaults:
-  - type: io.kestra.plugin.jdbc.sqlite
-    values:
-      url: jdbc:sqlite:myfile.db
-      fetchType: NONE
-
