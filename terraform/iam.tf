@@ -1,15 +1,27 @@
+# Kestra 2.0 RBAC: roles declare `resources { type, actions }` with fine-grained
+# actions (VIEW, LIST, EXECUTE, KILL, ...) instead of the pre-2.0 READ/CREATE/
+# UPDATE/DELETE.
+#
+# Users keep their `groups` list: the instance-level user endpoint the provider
+# uses grants tenant access for each group's tenant as a side effect, which is
+# what makes the tenant-scoped bindings and passwords below work on Kestra 2.0.
+# (Provider 2.0.0-rc1 has no kestra_user_tenant_access resource yet; switch to
+# it plus kestra_user_group_membership once a later provider release ships it.)
+
+# --- Data Engineers ------------------------------------------------------------
+
 resource "kestra_role" "example" {
   name        = "Flow Developer"
   description = "Role with read and update permissions for flows and executions"
 
-  permissions {
-    type        = "FLOW"
-    permissions = ["READ", "UPDATE"]
+  resources {
+    type    = "FLOW"
+    actions = ["VIEW", "LIST", "EXPORT", "UPDATE", "EXECUTE", "DISABLE", "ENABLE", "VALIDATE"]
   }
 
-  permissions {
-    type        = "EXECUTION"
-    permissions = ["READ", "UPDATE"]
+  resources {
+    type    = "EXECUTION"
+    actions = ["VIEW", "LIST", "ACCESS_LOGS", "ACCESS_OUTPUTS", "ACCESS_FILES", "EXPORT", "FOLLOW", "UPDATE", "RESTART", "KILL", "REPLAY", "PAUSE", "RESUME", "CHANGE_LABELS", "UNQUEUE", "FORCE_RUN"]
   }
 }
 
@@ -23,7 +35,7 @@ resource "kestra_group" "test" {
 }
 
 resource "kestra_group" "newgroup" {
-  name = "newGroup"  
+  name = "newGroup"
 }
 
 resource "kestra_binding" "example" {
@@ -77,55 +89,56 @@ resource "kestra_user" "david_patel" {
   groups      = [kestra_group.example.id]
 }
 
-# Infrastructure Team Resources
+# --- Infrastructure Team -------------------------------------------------------
+
 resource "kestra_role" "infrastructure_admin" {
   name        = "Infrastructure Admin"
   description = "Role with admin permissions for infrastructure team"
 
-  permissions {
-    type        = "FLOW"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "FLOW"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "EXECUTE", "DISABLE", "ENABLE", "VALIDATE", "EXPORT", "IMPORT", "PROMOTE"]
   }
 
-  permissions {
-    type        = "EXECUTION"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "EXECUTION"
+    actions = ["VIEW", "LIST", "UPDATE", "DELETE", "RESTART", "KILL", "REPLAY", "PAUSE", "RESUME", "CHANGE_LABELS", "ACCESS_LOGS", "ACCESS_OUTPUTS", "ACCESS_FILES", "EXPORT", "UNQUEUE", "FORCE_RUN", "FOLLOW"]
   }
 
-  permissions {
-    type        = "NAMESPACE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "TRIGGER"
+    actions = ["VIEW", "LIST", "UNLOCK", "RESTART", "DELETE", "DISABLE", "ENABLE", "EXPORT", "BACKFILL"]
   }
 
-  permissions {
-    type        = "NAMESPACE_FILE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # MANAGE_FILES covers what the former NAMESPACE_FILE type granted.
+  resources {
+    type    = "NAMESPACE"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "MANAGE_FILES"]
   }
 
-  permissions {
-    type        = "SERVICE_ACCOUNT"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "SERVICE_ACCOUNT"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "SECRET"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "SECRET"
+    actions = ["VIEW", "LIST", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "KV"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "KVSTORE"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "TEMPLATE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # The infrastructure team owns governance policies.
+  resources {
+    type    = "POLICY"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "EXECUTE", "EXPORT", "IMPORT"]
   }
 
-  permissions {
-    type        = "WORKER_GROUP"
-    permissions = ["READ", "UPDATE"]
-  }
+  # TEMPLATE no longer exists in Kestra 2.0. WORKER_GROUP is an instance-owner
+  # (super-admin) resource and cannot be granted through a role.
 }
 
 resource "kestra_group" "infrastructure" {
@@ -175,126 +188,138 @@ resource "kestra_user" "priya_sharma" {
   groups      = [kestra_group.infrastructure.id]
 }
 
+# --- QA -----------------------------------------------------------------------
+
 resource "kestra_role" "qa_full_crud" {
   name        = "QA Full CRUD"
-  description = "Role with full CRUD permissions for QA"
+  description = "Role with full permissions on every assignable resource for QA"
 
-  permissions {
-    type        = "FLOW"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "FLOW"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "EXECUTE", "DISABLE", "ENABLE", "VALIDATE", "EXPORT", "IMPORT", "PROMOTE"]
   }
 
-  permissions {
-    type        = "EXECUTION"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "EXECUTION"
+    actions = ["VIEW", "LIST", "UPDATE", "DELETE", "RESTART", "KILL", "REPLAY", "PAUSE", "RESUME", "CHANGE_LABELS", "ACCESS_LOGS", "ACCESS_OUTPUTS", "ACCESS_FILES", "EXPORT", "UNQUEUE", "FORCE_RUN", "FOLLOW"]
   }
 
-  permissions {
-    type        = "TEMPLATE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "TRIGGER"
+    actions = ["VIEW", "LIST", "UNLOCK", "RESTART", "DELETE", "DISABLE", "ENABLE", "EXPORT", "BACKFILL"]
   }
 
-  permissions {
-    type        = "NAMESPACE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "NAMESPACE"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "MANAGE_FILES"]
   }
 
-  permissions {
-    type        = "KVSTORE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "KVSTORE"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "DASHBOARD"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "DASHBOARD"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "SECRET"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "SECRET"
+    actions = ["VIEW", "LIST", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "GROUP"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "CREDENTIAL"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "ROLE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # Former GROUP_MEMBERSHIP merged into GROUP (MANAGE_MEMBERS).
+  resources {
+    type    = "GROUP"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "MANAGE_MEMBERS"]
   }
 
-  permissions {
-    type        = "BINDING"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "ROLE"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "AUDITLOG"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "BINDING"
+    actions = ["VIEW", "LIST", "CREATE", "DELETE"]
   }
 
-  permissions {
-    type        = "BLUEPRINT"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "AUDITLOG"
+    actions = ["VIEW", "LIST", "EXPORT"]
   }
 
-  permissions {
-    type        = "IMPERSONATE"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "BLUEPRINT"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "SETTING"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # Former SETTING split into SYSTEM_SETTINGS and TENANT_SETTINGS.
+  resources {
+    type    = "SYSTEM_SETTINGS"
+    actions = ["VIEW", "UPDATE"]
   }
 
-  permissions {
-    type        = "APP"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "TENANT_SETTINGS"
+    actions = ["VIEW", "UPDATE"]
   }
 
-  permissions {
-    type        = "APPEXECUTION"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # Former APPEXECUTION merged into APP.
+  resources {
+    type    = "APP"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "EXECUTE", "ACCESS_FILES", "ACCESS_LOGS"]
   }
 
-  permissions {
-    type        = "TEST"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # Former TEST renamed to TESTSUITE.
+  resources {
+    type    = "TESTSUITE"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "EXECUTE"]
   }
 
-  permissions {
-    type        = "ASSET"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "ASSET"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "LOCK", "UNLOCK"]
   }
 
-  permissions {
-    type        = "USER"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  # Former TENANT_ACCESS merged into USER; former IMPERSONATE type became the
+  # USER.IMPERSONATE action.
+  resources {
+    type    = "USER"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "MANAGE_GROUP_MEMBERSHIP", "IMPERSONATE"]
   }
 
-  permissions {
-    type        = "TENANT_ACCESS"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "SERVICE_ACCOUNT"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 
-  permissions {
-    type        = "SERVICE_ACCOUNT"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "INVITATION"
+    actions = ["VIEW", "LIST", "CREATE", "DELETE"]
   }
 
-  permissions {
-    type        = "INVITATION"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "POLICY"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE", "EXECUTE", "EXPORT", "IMPORT"]
   }
 
-  permissions {
-    type        = "GROUP_MEMBERSHIP"
-    permissions = ["READ", "UPDATE", "CREATE", "DELETE"]
+  resources {
+    type    = "COPILOT"
+    actions = ["USE"]
+  }
+
+  resources {
+    type    = "MCP_SERVER"
+    actions = ["VIEW", "LIST", "CREATE", "UPDATE", "DELETE"]
   }
 }
-
 
 resource "kestra_user" "qa_user" {
   email       = "qa.user@acme.com"

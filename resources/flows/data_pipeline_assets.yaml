@@ -35,8 +35,3 @@ tasks:
                 namespace: "{{flow.namespace}}"
                 metadata:
                   model_layer: mart
-pluginDefaults:
-  - type: io.kestra.plugin.jdbc.duckdb
-    values:
-      url: "jdbc:duckdb:md:my_db?motherduck_token={{ secret('MOTHERDUCK_TOKEN') }}"
-      fetchType: STORE

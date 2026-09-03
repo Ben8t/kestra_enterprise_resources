@@ -17,6 +17,7 @@ tasks:
     tasks:
       - id: create_bucket
         type: io.kestra.plugin.aws.cli.AwsCLI
+        allowFailure: true
         commands:
           - aws s3 mb s3://acme-{{ item.value | slugify }}-bucket
         assets:
@@ -26,11 +27,3 @@ tasks:
               metadata:
                 provider: s3
                 address: s3://acme-{{ item.value | slugify }}-bucket
-
-pluginDefaults:
-  - type: io.kestra.plugin.aws
-    values:
-      accessKeyId: "{{ secret('AWS_ACCESS_KEY') }}"
-      secretKeyId: "{{ secret('AWS_SECRET_ACCESS_KEY') }}"
-      region: "{{ secret('AWS_REGION') }}"
-      allowFailure: true

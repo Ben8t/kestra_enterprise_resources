@@ -2,16 +2,16 @@ terraform {
   required_providers {
     kestra = {
       source  = "kestra-io/kestra" # namespace of Kestra provider
-      version = "~> 1.0.0"        # version of Kestra Terraform provider, not the version of Kestra
+      version = "= 2.0.0-rc1"      # version of Kestra Terraform provider (targets Kestra 2.0 EE), not the version of Kestra
     }
   }
 }
 
 provider "kestra" {
-  url      = "http://localhost:8080"
-  username = var.kestra_user
-  password = var.kestra_password
-  tenant_id   = "main"
+  url       = "http://localhost:8080"
+  username  = var.kestra_user
+  password  = var.kestra_password
+  tenant_id = "main"
 }
 
 
