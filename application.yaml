@@ -64,11 +64,11 @@ kestra:
           model-name: gemini-3.6-flash
           api-key: ${GEMINI_API_KEY}
       - id: gpt
-        display-name: GPT-5.4 Mini
+        display-name: GPT-5.5
         type: openai
         isDefault: false
         configuration:
-          model-name: gpt-5.4-mini
+          model-name: gpt-5.5
           api-key: ${OPENAI_API_KEY}
 
   encryption:
