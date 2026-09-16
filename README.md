@@ -21,9 +21,11 @@ docker-compose up -d
 
 # Apply Terraform configuration
 cd terraform
-terraform init
+terraform init -upgrade
 terraform apply
 ```
+
+The Terraform configuration pins the Kestra provider to `2.0.0-rc1`, which targets Kestra 2.0 Enterprise Edition (the compose file runs `kestra-ee:v2.0.0-rc13`). Run `terraform init -upgrade` after pulling so the new provider is downloaded.
 
 ## Scripts
 

@@ -19,10 +19,3 @@ tasks:
           type: io.kestra.plugin.ee.assets.File
           metadata:
             owner: data
-
-pluginDefaults:
-  - type: io.kestra.plugin.aws
-    values:
-      accessKeyId: "{{ secret('AWS_ACCESS_KEY') }}"
-      secretKeyId: "{{ secret('AWS_SECRET_ACCESS_KEY') }}"
-      region: "{{ secret('AWS_REGION') }}"
