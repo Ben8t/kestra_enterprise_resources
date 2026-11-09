@@ -177,7 +177,7 @@ kestra:
     tmp-dir:
       path: /tmp/kestra-wd/tmp
 
-  url: http://localhost:8080/
+  url: http://localhost:28080/
 
   plugins:
     configurations:
